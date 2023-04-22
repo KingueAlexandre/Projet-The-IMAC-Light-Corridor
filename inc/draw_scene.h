@@ -6,6 +6,8 @@
 #include <stdio.h>
 #include <math.h>
 
+#include "../src/game/Mur.h"
+
 void drawFrame();
 
 void drawBase();
@@ -13,3 +15,8 @@ void drawBase();
 void drawArm();
 
 void drawPan();
+
+void drawMurs(LstMurs lst);
+
+void drawMur(int mur[4][3]);
+

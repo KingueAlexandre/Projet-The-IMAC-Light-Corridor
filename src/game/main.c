@@ -11,9 +11,11 @@
 /* Window properties */
 static const unsigned int WINDOW_WIDTH = 1000;
 static const unsigned int WINDOW_HEIGHT = 1000;
-static const char WINDOW_TITLE[] = "TD04 Ex01";
+static const char WINDOW_TITLE[] = "Main";
 static float aspectRatio = 1.0;
-static float pas = 0.;
+static float pas_base = 0.;
+static float pas_balancier = 0.;
+static float index_balancier = 1.;
 
 /* Minimal time wanted between two images */
 static const double FRAMERATE_IN_SECONDS = 1. / 30.;
@@ -97,6 +99,15 @@ int main(int argc, char **argv)
 {
 	/* GLFW initialisation */
 	GLFWwindow *window;
+	LstMurs lst;
+	int debut_x = 0;
+    int debut_y = 0;
+    int debut_z = 0;
+    int taille_x = 10;
+    int taille_y = 100;
+    int taille_z = 10;
+    int ex4 = 0;
+
 	if (!glfwInit())
 		return -1;
 
@@ -110,6 +121,10 @@ int main(int argc, char **argv)
 		// If no context created : exit !
 		glfwTerminate();
 		return -1;
+	}
+
+    if(insererM(&lst, debut_x, debut_y, debut_z, taille_x, taille_y, taille_z ) == -1){
+		exit(0);
 	}
 
 	/* Make the window's context current */
@@ -132,51 +147,67 @@ int main(int argc, char **argv)
 		/* Cleaning buffers and setting Matrix Mode */
 		glClearColor(0.2, 0.0, 0.0, 0.0);
 
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		glMatrixMode(GL_MODELVIEW);
-		glLoadIdentity();
-		setCamera();
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
+        setCamera();
 
-		/* Initial scenery setup */
-		glPushMatrix();
-		glTranslatef(0.0, 0.0, -0.01);
-		glScalef(10.0, 10.0, 1.0);
-		glColor3f(0.0, 0.0, 0.1);
-		drawSquare();
-		glBegin(GL_POINTS);
-		glColor3f(1.0, 1.0, 0.0);
-		glVertex3f(0.0, 0.0, 0.0);
-		glEnd();
-		glPopMatrix();
+        if(ex4){
 
-		/* Scene rendering */
-		drawBase();
+            /* Initial scenery setup */
+            glPushMatrix();
+            glTranslatef(0.0, 0.0, -0.01);
+            glScalef(10.0, 10.0, 1.0);
+            glColor3f(0.0, 0.0, 0.1);
+            drawSquare();
+            glBegin(GL_POINTS);
+            glColor3f(1.0, 1.0, 0.0);
+            glVertex3f(0.0, 0.0, 0.0);
+            glEnd();
+            glPopMatrix();
 
-		// glColor3f(1., 1., 1.);
-		// glTranslatef(4.0, 0.0, 5.);
-		// drawCircle();
+            /* Scene rendering */
 
-		// glLoadIdentity();
-		glPushMatrix();
-		glColor3f(1., 0., 0.);
-		glTranslatef(cos(pas) * 4., sin(pas) * 4., 5.);
-		drawSphere();
-		glPopMatrix();
+            glPushMatrix();
+            glColor3f(1., 0., 0.);
+            glTranslatef(cos(pas_base) * 4., sin(pas_base) * 4., 5.);
+            drawSphere();
+            glPopMatrix();
 
-		glPushMatrix();
-		glTranslatef(0., 0., 10.);
-		drawArm();
-		glPopMatrix();
+            glPushMatrix();
 
-		glPushMatrix();
-		glTranslatef(10., 0., 5.);
-		drawPan();
-		glPopMatrix();
-		glPushMatrix();
-		glTranslatef(-10., 0., 5.);
-		drawPan();
-		glPopMatrix();
+            glTranslatef(cos(pas_base), sin(pas_base), 0.);
+
+            drawBase();
+            glTranslatef(cos(pas_base), sin(pas_base), 0.);
+
+            glRotated(pas_balancier, 0., 1., 0.);
+            glPushMatrix();
+            glTranslatef(0., 0., 10.);
+            drawArm();
+            glPopMatrix();
+
+            glPushMatrix();
+            glTranslatef(10., 0., 5.);
+            drawPan();
+            glPopMatrix();
+            glPushMatrix();
+            glTranslatef(-10., 0., 5.);
+            drawPan();
+            glPopMatrix();
+
+            glPopMatrix();
+		}
+
+        glPushMatrix();
+
+        drawMurs(lst);
+                drawFrame();
+
+        glPopMatrix();
+
+
 
 		/* Swap front and back buffers */
 		glfwSwapBuffers(window);
@@ -193,7 +224,22 @@ int main(int argc, char **argv)
 		}
 
 		/* Animate scenery */
-		pas += .1;
+		if (flag_animate_rot_scale == 1)
+		{
+			pas_base += .1;
+		}
+		if (flag_animate_rot_arm == 1)
+		{
+			if (pas_balancier >= 10.)
+			{
+				index_balancier = -1.;
+			}
+			else if (pas_balancier <= -10.)
+			{
+				index_balancier = 1.;
+			}
+			pas_balancier += index_balancier;
+		}
 	}
 
 	glfwTerminate();
