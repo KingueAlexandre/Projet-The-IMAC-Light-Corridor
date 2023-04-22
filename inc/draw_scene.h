@@ -7,6 +7,7 @@
 #include <math.h>
 
 #include "../src/game/Mur.h"
+#include "../src/game/Balle.h"
 
 void drawFrame();
 
@@ -18,5 +19,6 @@ void drawPan();
 
 void drawMurs(LstMurs lst);
 
-void drawMur(int mur[4][3]);
+void drawMur(float mur[4][3]);
 
+void drawBalle(Balle balle);

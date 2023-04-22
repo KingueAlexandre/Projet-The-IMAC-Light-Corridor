@@ -9,12 +9,15 @@
 #include "draw_scene.h"
 
 /* Window properties */
-static const unsigned int WINDOW_WIDTH = 1000;
-static const unsigned int WINDOW_HEIGHT = 1000;
+static const unsigned int WINDOW_WIDTH = 750;
+static const unsigned int WINDOW_HEIGHT = 750;
 static const char WINDOW_TITLE[] = "Main";
 static float aspectRatio = 1.0;
+
 static float pas_base = 0.;
 static float pas_balancier = 0.;
+
+static int avance_cam_y = 0;
 static float index_balancier = 1.;
 
 /* Minimal time wanted between two images */
@@ -23,6 +26,8 @@ static const double FRAMERATE_IN_SECONDS = 1. / 30.;
 /* IHM flag */
 static int flag_animate_rot_scale = 0;
 static int flag_animate_rot_arm = 0;
+static int flag_mode_cam = 1;
+static int flag_animate_balle = 0;
 
 /* Error handling function */
 void onError(int error, const char *description)
@@ -63,6 +68,12 @@ void onKey(GLFWwindow *window, int key, int scancode, int action, int mods)
 		case GLFW_KEY_T:
 			flag_animate_rot_scale = 1 - flag_animate_rot_scale;
 			break;
+		case GLFW_KEY_C:
+			flag_mode_cam = 1 - flag_mode_cam;
+			break;
+		case GLFW_KEY_B:
+			flag_animate_balle = 1 - flag_animate_balle;
+			break;
 		case GLFW_KEY_KP_9:
 			if (dist_zoom < 100.0f)
 				dist_zoom *= 1.1;
@@ -95,18 +106,33 @@ void onKey(GLFWwindow *window, int key, int scancode, int action, int mods)
 	}
 }
 
+static void mouse_button_callback(GLFWwindow *window, int button, int action, int mods)
+{
+	// printf("mouse\n");
+
+	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
+	{
+		avance_cam_y += 5;
+	}
+	else if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
+	{
+		avance_cam_y -= 5;
+	}
+}
+
 int main(int argc, char **argv)
 {
 	/* GLFW initialisation */
 	GLFWwindow *window;
 	LstMurs lst;
-	int debut_x = 0;
-    int debut_y = 0;
-    int debut_z = 0;
-    int taille_x = 10;
-    int taille_y = 100;
-    int taille_z = 10;
-    int ex4 = 0;
+	Balle balle;
+	float debut_x = 0;
+	float debut_y = 0;
+	float debut_z = 0;
+	float taille_x = 15;
+	float taille_y = 100;
+	float taille_z = 15;
+	int nb_section = 1;
 
 	if (!glfwInit())
 		return -1;
@@ -122,22 +148,31 @@ int main(int argc, char **argv)
 		glfwTerminate();
 		return -1;
 	}
-
-    if(insererM(&lst, debut_x, debut_y, debut_z, taille_x, taille_y, taille_z ) == -1){
+	/*
+	printf("Fenetre créé.\nInit Murs:\n");
+	*/
+	if (insererM(&lst, debut_x, debut_y, debut_z, taille_x, taille_y, taille_z) == -1)
+	{
 		exit(0);
 	}
+	printf("Init Balle\n");
+
+	balle = initBalle(-taille_x / 2., taille_y / 3., taille_z / 2);
 
 	/* Make the window's context current */
 	glfwMakeContextCurrent(window);
 
 	glfwSetWindowSizeCallback(window, onWindowResized);
 	glfwSetKeyCallback(window, onKey);
+	glfwSetMouseButtonCallback(window, mouse_button_callback);
 
 	onWindowResized(window, WINDOW_WIDTH, WINDOW_HEIGHT);
 
 	glPointSize(5.0);
 	glEnable(GL_DEPTH_TEST);
-
+	/*
+	printf("Animation commnce\n");
+*/
 	/* Loop until the user closes the window */
 	while (!glfwWindowShouldClose(window))
 	{
@@ -147,67 +182,35 @@ int main(int argc, char **argv)
 		/* Cleaning buffers and setting Matrix Mode */
 		glClearColor(0.2, 0.0, 0.0, 0.0);
 
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glMatrixMode(GL_MODELVIEW);
-        glLoadIdentity();
-        setCamera();
-
-        if(ex4){
-
-            /* Initial scenery setup */
-            glPushMatrix();
-            glTranslatef(0.0, 0.0, -0.01);
-            glScalef(10.0, 10.0, 1.0);
-            glColor3f(0.0, 0.0, 0.1);
-            drawSquare();
-            glBegin(GL_POINTS);
-            glColor3f(1.0, 1.0, 0.0);
-            glVertex3f(0.0, 0.0, 0.0);
-            glEnd();
-            glPopMatrix();
-
-            /* Scene rendering */
-
-            glPushMatrix();
-            glColor3f(1., 0., 0.);
-            glTranslatef(cos(pas_base) * 4., sin(pas_base) * 4., 5.);
-            drawSphere();
-            glPopMatrix();
-
-            glPushMatrix();
-
-            glTranslatef(cos(pas_base), sin(pas_base), 0.);
-
-            drawBase();
-            glTranslatef(cos(pas_base), sin(pas_base), 0.);
-
-            glRotated(pas_balancier, 0., 1., 0.);
-            glPushMatrix();
-            glTranslatef(0., 0., 10.);
-            drawArm();
-            glPopMatrix();
-
-            glPushMatrix();
-            glTranslatef(10., 0., 5.);
-            drawPan();
-            glPopMatrix();
-            glPushMatrix();
-            glTranslatef(-10., 0., 5.);
-            drawPan();
-            glPopMatrix();
-
-            glPopMatrix();
+		glMatrixMode(GL_MODELVIEW);
+		glLoadIdentity();
+		if (flag_mode_cam)
+		{
+			gluLookAt(-taille_x / 2., -25. + avance_cam_y, taille_z / 2.,
+					  -taille_x / 2., 5. + dist_zoom + avance_cam_y, taille_z / 2.,
+					  0.0, 0.0, 1.0);
+		}
+		else
+		{
+			setCamera();
 		}
 
-        glPushMatrix();
+		/*
+	printf("Etape animation:\n");*/
+		glPushMatrix();
+		/*
+		printf("Murs\n");
+	*/
+		drawMurs(lst);
+		drawFrame();
+		/*
+		printf("Balle\n");
+	*/
+		drawBalle(balle);
 
-        drawMurs(lst);
-                drawFrame();
-
-        glPopMatrix();
-
-
+		glPopMatrix();
 
 		/* Swap front and back buffers */
 		glfwSwapBuffers(window);
@@ -240,6 +243,26 @@ int main(int argc, char **argv)
 			}
 			pas_balancier += index_balancier;
 		}
+		if (flag_animate_balle == 1)
+		{
+			colision_balle_mur(&balle, taille_x, taille_z);
+			mouv_balle(&balle);
+		}
+		if (avance_cam_y >= nb_section * taille_y - taille_y / 2)
+		{
+			printf("Affichage maj.\n");
+			nb_section += 1;
+			printf("debut_x, debut_y , debut_z, taille_x, taille_y, taille_z : %f, %f, %f, %f, %f, %f", debut_x, debut_y + taille_y, debut_z, taille_x, taille_y, taille_z);
+			if (insererM(&lst, debut_x, debut_y + taille_y, debut_z, taille_x, taille_y, taille_z) == -1)
+			{
+				printf("Erreur.\n");
+				exit(0);
+			}
+			debut_y += taille_y;
+		}
+		/*
+		printf("Collion maj:\n");
+		*/
 	}
 
 	glfwTerminate();

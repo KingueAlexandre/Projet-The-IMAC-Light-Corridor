@@ -6,23 +6,20 @@ static int courrant_num_mur = 0;
 typedef struct Murs
 {
     int num;
-    int debut_x;
-    int debut_y;
-    int debut_z;
-    int taille_x;
-    int taille_y;
-    int taille_z;
-    int mur1[4][3];
-    int mur2[4][3];
-    int mur3[4][3];
-    int mur4[4][3];
+    float debut_x;
+    float debut_y;
+    float debut_z;
+    float taille_x;
+    float taille_y;
+    float taille_z;
+    float mur[4][3];
 
     struct Murs *suivant;
-}Murs, *LstMurs;
+} Murs, *LstMurs;
 
-Murs *AlloueMurs(int debut_x, int debut_y, int debut_z, int taille_x, int taille_y, int taille_z);
+Murs *AlloueMurs(float debut_x, float debut_y, float debut_z, float taille_x, float taille_y, float taille_z);
 
-int insererM(LstMurs *lst, int debut_x, int debut_y, int debut_z, int taille_x, int taille_y, int taille_z);
+int insererM(LstMurs *lst, float debut_x, float debut_y, float debut_z, float taille_x, float taille_y, float taille_z);
 
 void freePile(LstMurs *murs);
 

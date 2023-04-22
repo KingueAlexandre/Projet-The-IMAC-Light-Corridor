@@ -47,8 +47,6 @@ void drawFrame()
 void drawArm()
 {
 
-    glColor3f(245 / 255., 164 / 255., 66 / 255.);
-
     glPushMatrix();
 
     glPushMatrix();
@@ -110,44 +108,93 @@ void drawPan()
     glEnd();
 }
 
-void drawMurs(LstMurs lst){
+void drawMurs(LstMurs lst)
+{
     Murs *ret = lst;
-    while(ret!=NULL){
+    while (ret != NULL)
+    {
+        printf("Section n⁰%d\n", ret->num);
         glColor3f(89 / 255., 0, 0 / 255.);
 
         glPushMatrix();
-        drawMur(ret->mur1);
+        drawMur(ret->mur);
         glPopMatrix();
 
         glPushMatrix();
         glRotatef(90., 0., 1., 0.);
-        drawMur(ret->mur1);
+        drawMur(ret->mur);
         glPopMatrix();
 
         glPushMatrix();
         glTranslatef(0., 0., ret->taille_z);
-        drawMur(ret->mur1);
+        drawMur(ret->mur);
         glPopMatrix();
 
         glPushMatrix();
         glRotatef(90., 0., 1., 0.);
         glTranslatef(0., 0., -ret->taille_z);
-        drawMur(ret->mur1);
+        drawMur(ret->mur);
         glPopMatrix();
 
-        /*
-        glScalef(.50, .50, .50);
+        glPushMatrix();
+        glRotatef(90., 0., 0., 1.);
+        glScalef(4., .50, .50);
+        glTranslatef(12.5, 0., 0);
+        glColor3f(155., 0., 155.);
+
         drawArm();
-        */
+        glColor3f(0., 0., 0.);
+        glPushMatrix();
+
+        glTranslatef(0., 0., 2 * ret->taille_z);
+        glColor3f(155., 0., 155.);
+
+        drawArm();
+
+        glPopMatrix();
+        glPopMatrix();
+
+        glPushMatrix();
+        glTranslatef(-ret->taille_x, 0., 0.);
+        glPushMatrix();
+        glRotatef(90., 0., 0., 1.);
+        glScalef(4., .50, .50);
+        glTranslatef(12.5, 0., 0);
+        glColor3f(155., 0., 155.);
+
+        drawArm();
+
+        glColor3f(0., 0., 0.);
+        glPushMatrix();
+        glTranslatef(0., 0., 2 * ret->taille_z);
+        glColor3f(155., 0., 155.);
+
+        drawArm();
+        glPopMatrix();
+        glPopMatrix();
+        glPopMatrix();
+
         ret = ret->suivant;
     }
 }
 
-void drawMur(int mur[4][3]){
+void drawMur(float mur[4][3])
+{
 
     glBegin(GL_TRIANGLE_FAN);
-    for(int i = 0; i < 4; i++){
+    for (int i = 0; i < 4; i++)
+    {
+        printf("(%f,%f,%f) ", mur[i][0], mur[i][1], mur[i][2]);
         glVertex3f(mur[i][0], mur[i][1], mur[i][2]);
     }
+    printf("\n");
     glEnd();
+}
+
+void drawBalle(Balle balle)
+{
+    glPushMatrix();
+    glTranslatef(balle.x, balle.y, balle.z);
+    drawSphere();
+    glPopMatrix();
 }
