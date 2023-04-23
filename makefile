@@ -31,6 +31,10 @@ draw_scene.o : draw_scene.c draw_scene.h Mur.h Balle.h
 	mkdir -p `dirname $@`
 	$(CC) -o  $@ -I $(INCDIR) -c $< $(CFLAGS)
 
+Balle.o : Balle.c Balle.h Mur.h
+	mkdir -p `dirname $@`
+	$(CC) -o  $@ -I $(INCDIR) -c $< $(CFLAGS)
+
 clean :
 	rm -rf *~
 	rm -rf $(SRCDIR)*/*~

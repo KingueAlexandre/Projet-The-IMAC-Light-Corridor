@@ -45,3 +45,19 @@ void colision_balle_mur(Balle *balle, int max_x, int max_z)
         balle->vec_z *= -1;
     }
 }
+
+void colision_balle_obs(Balle *balle, LstObstacles obstacles)
+{
+    Obstacles *ret = obstacles;
+    while (ret != NULL)
+    {
+        if (((balle->z <= ret->debut_z && balle->z + 1. >= ret->debut_z) && (balle->z >= ret->debut_z && balle->z - 1. <= ret->debut_z)))
+        {
+            /*
+            (balle->z < ret->debut_z && balle->z + 1. >= ret->debut_z)*/
+            printf("Colision Obstacle: (%f,%f,%f)\n", balle->x, balle->y, balle->z);
+            balle->vec_z *= -1;
+        }
+        ret = ret->suivant;
+    }
+}

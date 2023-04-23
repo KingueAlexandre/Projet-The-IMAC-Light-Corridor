@@ -126,6 +126,7 @@ int main(int argc, char **argv)
 	GLFWwindow *window;
 	LstMurs lst;
 	Balle balle;
+	LstObstacles obstacles;
 	float debut_x = 0;
 	float debut_y = 0;
 	float debut_z = 0;
@@ -151,6 +152,7 @@ int main(int argc, char **argv)
 	/*
 	printf("Fenetre créé.\nInit Murs:\n");
 	*/
+	printf("InsereM\n");
 	if (insererM(&lst, debut_x, debut_y, debut_z, taille_x, taille_y, taille_z) == -1)
 	{
 		exit(0);
@@ -158,6 +160,15 @@ int main(int argc, char **argv)
 	printf("Init Balle\n");
 
 	balle = initBalle(-taille_x / 2., taille_y / 3., taille_z / 2);
+	printf("Insere0\n");
+
+	if (insererO(&obstacles, lst) == -1)
+	{
+		printf("Erreur. insererO\n");
+		exit(0);
+	}
+	printfObstacles(obstacles);
+	printf("Fin Init\n");
 
 	/* Make the window's context current */
 	glfwMakeContextCurrent(window);
@@ -209,6 +220,13 @@ int main(int argc, char **argv)
 		printf("Balle\n");
 	*/
 		drawBalle(balle);
+		/*
+		printf("Problème??\n");
+		*/
+		drawObstacles(obstacles);
+		/*
+		printf("Non\n");
+		*/
 
 		glPopMatrix();
 
@@ -245,19 +263,30 @@ int main(int argc, char **argv)
 		}
 		if (flag_animate_balle == 1)
 		{
+			colision_balle_obs(&balle, obstacles);
 			colision_balle_mur(&balle, taille_x, taille_z);
 			mouv_balle(&balle);
 		}
 		if (avance_cam_y >= nb_section * taille_y - taille_y / 2)
 		{
+			/*/
 			printf("Affichage maj.\n");
+			*/
 			nb_section += 1;
+			/*
 			printf("debut_x, debut_y , debut_z, taille_x, taille_y, taille_z : %f, %f, %f, %f, %f, %f", debut_x, debut_y + taille_y, debut_z, taille_x, taille_y, taille_z);
+			*/
 			if (insererM(&lst, debut_x, debut_y + taille_y, debut_z, taille_x, taille_y, taille_z) == -1)
 			{
-				printf("Erreur.\n");
+				printf("Erreur. insererM\n");
 				exit(0);
 			}
+			if (insererO(&obstacles, lst) == -1)
+			{
+				printf("Erreur. insererO\n");
+				exit(0);
+			}
+			printfObstacles(obstacles);
 			debut_y += taille_y;
 		}
 		/*

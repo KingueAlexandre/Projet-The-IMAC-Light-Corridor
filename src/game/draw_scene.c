@@ -1,6 +1,8 @@
 #include "draw_scene.h"
 #include "3D_tools.h"
 
+#define NB_BIT_COLOR 256
+
 void drawBase()
 {
     glColor3f(235 / 255., 207 / 255., 52 / 255.);
@@ -113,8 +115,10 @@ void drawMurs(LstMurs lst)
     Murs *ret = lst;
     while (ret != NULL)
     {
+        /*
         printf("Section n⁰%d\n", ret->num);
-        glColor3f(89 / 255., 0, 0 / 255.);
+        */
+        glColor3f(ret->r / NB_BIT_COLOR, ret->g / NB_BIT_COLOR, ret->b / NB_BIT_COLOR);
 
         glPushMatrix();
         drawMur(ret->mur);
@@ -135,7 +139,7 @@ void drawMurs(LstMurs lst)
         glTranslatef(0., 0., -ret->taille_z);
         drawMur(ret->mur);
         glPopMatrix();
-
+        /*
         glPushMatrix();
         glRotatef(90., 0., 0., 1.);
         glScalef(4., .50, .50);
@@ -172,23 +176,66 @@ void drawMurs(LstMurs lst)
         drawArm();
         glPopMatrix();
         glPopMatrix();
-        glPopMatrix();
 
+        glPopMatrix();
+*/
         ret = ret->suivant;
     }
 }
 
+void drawObstacles(LstObstacles lst)
+{
+    Obstacles *ret = lst;
+    while (ret != NULL)
+    {
+        /*
+        printf("Section n⁰%d\n", ret->num);
+
+        printf("%f,%f,%f\n", ret->r, ret->g, ret->b);*/
+        glColor3f(ret->r / NB_BIT_COLOR, ret->g / NB_BIT_COLOR, ret->b / NB_BIT_COLOR);
+
+        glPushMatrix();
+        drawMur(ret->mur);
+        glPopMatrix();
+        ret = ret->suivant;
+    }
+}
 void drawMur(float mur[4][3])
 {
 
     glBegin(GL_TRIANGLE_FAN);
     for (int i = 0; i < 4; i++)
     {
+        /*
         printf("(%f,%f,%f) ", mur[i][0], mur[i][1], mur[i][2]);
+        */
         glVertex3f(mur[i][0], mur[i][1], mur[i][2]);
     }
-    printf("\n");
     glEnd();
+}
+
+void printfObstacles(LstObstacles lst)
+{
+    printf("\ndrawObstacles\n");
+    Obstacles *ret = lst;
+    while (ret != NULL)
+    {
+        /*
+        printf("Section n⁰%d\n", ret->num);
+        */
+
+        printfMur(ret->mur);
+        ret = ret->suivant;
+    }
+    printf("Fin\n");
+}
+void printfMur(float mur[4][3])
+{
+    for (int i = 0; i < 4; i++)
+    {
+        printf("(%f,%f,%f) ", mur[i][0], mur[i][1], mur[i][2]);
+    }
+    printf("\n");
 }
 
 void drawBalle(Balle balle)
