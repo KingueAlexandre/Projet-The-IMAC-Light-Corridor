@@ -68,7 +68,7 @@ Obstacles *AlloueObstacles1(float debut_x, float debut_y, float debut_z, float t
     obstacles->type_obs = 1;
     obstacles->num = courrant_num_obs++;
 
-    tmp = ((float)rand() / (float)(RAND_MAX)) * (taille_x - 4.);
+    tmp = ((float)rand() / (float)(RAND_MAX)) * (taille_x - DIST_RAYON_COTE_RAQUETTE * 2 + 2);
     printf("tmp=%f\n", tmp);
     if (rand() % 2 == 0)
     {
@@ -148,7 +148,7 @@ Obstacles *AlloueObstacles2(float debut_x, float debut_y, float debut_z, float t
     obstacles->type_obs = 1;
     obstacles->num = courrant_num_obs++;
 
-    tmp = ((float)rand() / (float)(RAND_MAX)) * (taille_z - 4.);
+    tmp = ((float)rand() / (float)(RAND_MAX)) * (taille_z - DIST_RAYON_COTE_RAQUETTE * 2 + 2);
     printf("tmp=%f\n", tmp);
     if (rand() % 2 == 0)
     {
@@ -183,7 +183,85 @@ Obstacles *AlloueObstacles2(float debut_x, float debut_y, float debut_z, float t
         printf("2-1\n");
         obstacles->debut_x = debut_x;
         obstacles->debut_y = debut_y;
+        obstacles->debut_z = tmp;
+        obstacles->taille_x = taille_x;
+        obstacles->taille_y = taille_y;
+        obstacles->taille_z = tmp;
+
+        obstacles->mur[0][0] = debut_x;
+        obstacles->mur[0][1] = debut_y;
+        obstacles->mur[0][2] = tmp;
+
+        obstacles->mur[1][0] = -taille_x;
+        obstacles->mur[1][1] = debut_y;
+        obstacles->mur[1][2] = tmp;
+
+        obstacles->mur[2][0] = -taille_x;
+        obstacles->mur[2][1] = debut_y;
+        obstacles->mur[2][2] = taille_z;
+
+        obstacles->mur[3][0] = debut_x;
+        obstacles->mur[3][1] = debut_y;
+        obstacles->mur[3][2] = taille_z;
+    }
+
+    obstacles->r = 100.;
+    obstacles->g = 0.;
+    obstacles->b = 100.;
+
+    obstacles->suivant = NULL;
+    return obstacles;
+}
+
+Obstacles *AlloueObstacles3(float debut_x, float debut_y, float debut_z, float taille_x, float taille_y, float taille_z)
+{
+    Obstacles *obstacles = (Obstacles *)malloc(sizeof(Obstacles));
+    // Element *element = malloc(sizeof(*element));
+    float tmp;
+    if (obstacles == NULL)
+    {
+        printf("malloc(sizeof(LstMurs)) déconne.\n");
+        return NULL;
+    }
+    obstacles->type_obs = 1;
+    obstacles->num = courrant_num_obs++;
+
+    tmp = ((float)rand() / (float)(RAND_MAX)) * (taille_z - DIST_RAYON_COTE_RAQUETTE * 2 + 2);
+    printf("tmp=%f\n", tmp);
+    if (rand() % 2 == 0)
+    {
+        obstacles->sous_type = 0;
+        printf("2-0\n");
+        obstacles->debut_x = debut_x;
+        obstacles->debut_y = debut_y;
         obstacles->debut_z = debut_z;
+        obstacles->taille_x = taille_x;
+        obstacles->taille_y = taille_y;
+        obstacles->taille_z = tmp;
+
+        obstacles->mur[0][0] = debut_x;
+        obstacles->mur[0][1] = debut_y;
+        obstacles->mur[0][2] = debut_z;
+
+        obstacles->mur[1][0] = -taille_x;
+        obstacles->mur[1][1] = debut_y;
+        obstacles->mur[1][2] = debut_z;
+
+        obstacles->mur[2][0] = -taille_x;
+        obstacles->mur[2][1] = debut_y;
+        obstacles->mur[2][2] = debut_z + tmp;
+
+        obstacles->mur[3][0] = debut_x;
+        obstacles->mur[3][1] = debut_y;
+        obstacles->mur[3][2] = debut_z + tmp;
+    }
+    else
+    {
+        obstacles->sous_type = 1;
+        printf("2-1\n");
+        obstacles->debut_x = debut_x;
+        obstacles->debut_y = debut_y;
+        obstacles->debut_z = tmp;
         obstacles->taille_x = taille_x;
         obstacles->taille_y = taille_y;
         obstacles->taille_z = tmp;

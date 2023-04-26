@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 #include "Mur.h"
+#include "Joueur.h"
 
 #ifndef __BALLE__
 #define __BALLE__
@@ -27,6 +29,12 @@ void mouv_balle(Balle *balle);
 
 void colision_balle_mur(Balle *balle, int max_x, int max_z);
 
-void colision_balle_obs(Balle *balle, LstObstacles obstacles);
+int colision_balle_obs_type(Balle *balle, Obstacles *ret);
+
+void colision_balle_obs(Balle *balle, LstObstacles obstacles, Joueur joueur);
+
+int colision_balle_joueur(Balle *balle, Joueur joueur);
+
+int collision_joueur_murs(LstObstacles obstacles, Joueur joueur);
 
 #endif

@@ -125,12 +125,14 @@ void drawMurs(LstMurs lst)
         glPopMatrix();
 
         glPushMatrix();
-        glRotatef(90., 0., 1., 0.);
+        glTranslatef(0., 0., ret->taille_z);
         drawMur(ret->mur);
         glPopMatrix();
 
+        glColor3f(ret->g / NB_BIT_COLOR, ret->b / NB_BIT_COLOR, ret->r / NB_BIT_COLOR);
+
         glPushMatrix();
-        glTranslatef(0., 0., ret->taille_z);
+        glRotatef(90., 0., 1., 0.);
         drawMur(ret->mur);
         glPopMatrix();
 
@@ -139,19 +141,20 @@ void drawMurs(LstMurs lst)
         glTranslatef(0., 0., -ret->taille_z);
         drawMur(ret->mur);
         glPopMatrix();
-        /*
+
+        /*COINs*/
         glPushMatrix();
         glRotatef(90., 0., 0., 1.);
         glScalef(4., .50, .50);
-        glTranslatef(12.5, 0., 0);
-        glColor3f(155., 0., 155.);
+        glTranslatef((ret->taille_y / 4) * (1 + ret->num), 0., 0);
+        glColor3f(0., 0., 0.);
 
         drawArm();
         glColor3f(0., 0., 0.);
         glPushMatrix();
 
         glTranslatef(0., 0., 2 * ret->taille_z);
-        glColor3f(155., 0., 155.);
+        glColor3f(0., 0., 0.);
 
         drawArm();
 
@@ -163,40 +166,40 @@ void drawMurs(LstMurs lst)
         glPushMatrix();
         glRotatef(90., 0., 0., 1.);
         glScalef(4., .50, .50);
-        glTranslatef(12.5, 0., 0);
-        glColor3f(155., 0., 155.);
+        glTranslatef((ret->taille_y / 4) * (1 + ret->num), 0., 0);
+        glColor3f(0., 0., 0.);
 
         drawArm();
 
         glColor3f(0., 0., 0.);
         glPushMatrix();
         glTranslatef(0., 0., 2 * ret->taille_z);
-        glColor3f(155., 0., 155.);
+        glColor3f(0., 0., 0.);
 
         drawArm();
         glPopMatrix();
         glPopMatrix();
 
         glPopMatrix();
-*/
+
         ret = ret->suivant;
     }
 }
 
-void drawObstacles(LstObstacles lst)
+void drawObstacles(LstObstacles lst, Joueur joueur)
 {
     Obstacles *ret = lst;
     while (ret != NULL)
     {
-        /*
-        printf("Section n⁰%d\n", ret->num);
+        if (ret->mur[0][1] > joueur.y)
+        {
+            glColor3f(ret->r / NB_BIT_COLOR, ret->g / NB_BIT_COLOR, ret->b / NB_BIT_COLOR);
 
-        printf("%f,%f,%f\n", ret->r, ret->g, ret->b);*/
-        glColor3f(ret->r / NB_BIT_COLOR, ret->g / NB_BIT_COLOR, ret->b / NB_BIT_COLOR);
+            glPushMatrix();
+            drawMur(ret->mur);
+            glPopMatrix();
+        }
 
-        glPushMatrix();
-        drawMur(ret->mur);
-        glPopMatrix();
         ret = ret->suivant;
     }
 }
@@ -244,4 +247,18 @@ void drawBalle(Balle balle)
     glTranslatef(balle.x, balle.y, balle.z);
     drawSphere();
     glPopMatrix();
+}
+
+void drawJoueur(Joueur joueur)
+{
+    glColor3f(1., 1., 1.);
+
+    glBegin(GL_LINE_LOOP);
+
+    glVertex3f(joueur.max_cote_x, joueur.y, joueur.min_cote_z);
+    glVertex3f(joueur.min_cote_x, joueur.y, joueur.min_cote_z);
+    glVertex3f(joueur.min_cote_x, joueur.y, joueur.max_cote_z);
+    glVertex3f(joueur.max_cote_x, joueur.y, joueur.max_cote_z);
+
+    glEnd();
 }

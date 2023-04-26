@@ -11,15 +11,21 @@
 /* Window properties */
 static const unsigned int WINDOW_WIDTH = 750;
 static const unsigned int WINDOW_HEIGHT = 750;
+static float TAILLE_X = 15;
+static float TAILLE_Y = 100;
+static float TAILLE_Z = 15;
 static const char WINDOW_TITLE[] = "Main";
 static float aspectRatio = 1.0;
 
+/*
 static float pas_base = 0.;
 static float pas_balancier = 0.;
-
-static int avance_cam_y = 0;
+*/
+static float dist_cam_raq = 13.;
+static float avance_cam_y = 2.;
+/*
 static float index_balancier = 1.;
-
+*/
 /* Minimal time wanted between two images */
 static const double FRAMERATE_IN_SECONDS = 1. / 30.;
 
@@ -27,7 +33,13 @@ static const double FRAMERATE_IN_SECONDS = 1. / 30.;
 static int flag_animate_rot_scale = 0;
 static int flag_animate_rot_arm = 0;
 static int flag_mode_cam = 1;
-static int flag_animate_balle = 0;
+static int flag_animate_balle = 1;
+static int flag_balle_collante = 1;
+
+static LstMurs lst;
+static LstObstacles obstacles;
+static Joueur joueur;
+static Balle balle;
 
 /* Error handling function */
 void onError(int error, const char *description)
@@ -110,13 +122,26 @@ static void mouse_button_callback(GLFWwindow *window, int button, int action, in
 {
 	// printf("mouse\n");
 
-	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
+	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS && flag_balle_collante == 0 && collision_joueur_murs(obstacles, joueur) == 0)
 	{
 		avance_cam_y += 5;
+		joueur.y += 5;
+
+		printf("avance_cam_y : %f\n", avance_cam_y);
 	}
-	else if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
+	else if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS && -dist_cam_raq <= -20. + avance_cam_y && flag_balle_collante == 0)
 	{
 		avance_cam_y -= 5;
+		joueur.y -= 5;
+		printf("avance_cam_y : %f\n", avance_cam_y);
+	}
+	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS && flag_balle_collante)
+	{
+		flag_balle_collante = 0;
+		balle.vec_y = 1.;
+		balle.vec_x = 0.;
+		balle.vec_z = 0.;
+		balle.y += 1.1;
 	}
 }
 
@@ -124,16 +149,13 @@ int main(int argc, char **argv)
 {
 	/* GLFW initialisation */
 	GLFWwindow *window;
-	LstMurs lst;
-	Balle balle;
-	LstObstacles obstacles;
-	float debut_x = 0;
-	float debut_y = 0;
-	float debut_z = 0;
-	float taille_x = 15;
-	float taille_y = 100;
-	float taille_z = 15;
+
+	double xpos, zpos;
+	float debut_x = 0, debut_y = 0, debut_z = 0;
+	float taille_x = TAILLE_X, taille_y = TAILLE_Y, taille_z = TAILLE_Z;
 	int nb_section = 1;
+
+	joueur = initJoueur(taille_x / 2, 0., taille_z / 2, TAILLE_X, TAILLE_Z, DIST_RAYON_COTE_RAQUETTE);
 
 	if (!glfwInit())
 		return -1;
@@ -149,26 +171,18 @@ int main(int argc, char **argv)
 		glfwTerminate();
 		return -1;
 	}
-	/*
-	printf("Fenetre créé.\nInit Murs:\n");
-	*/
-	printf("InsereM\n");
+
 	if (insererM(&lst, debut_x, debut_y, debut_z, taille_x, taille_y, taille_z) == -1)
 	{
+		printf("Erreur. insererM\n");
 		exit(0);
 	}
-	printf("Init Balle\n");
-
 	balle = initBalle(-taille_x / 2., taille_y / 3., taille_z / 2);
-	printf("Insere0\n");
-
 	if (insererO(&obstacles, lst) == -1)
 	{
 		printf("Erreur. insererO\n");
 		exit(0);
 	}
-	printfObstacles(obstacles);
-	printf("Fin Init\n");
 
 	/* Make the window's context current */
 	glfwMakeContextCurrent(window);
@@ -181,25 +195,22 @@ int main(int argc, char **argv)
 
 	glPointSize(5.0);
 	glEnable(GL_DEPTH_TEST);
-	/*
-	printf("Animation commnce\n");
-*/
+
 	/* Loop until the user closes the window */
-	while (!glfwWindowShouldClose(window))
+	while (!glfwWindowShouldClose(window) && joueur.vie > 0)
 	{
 		/* Get time (in second) at loop beginning */
 		double startTime = glfwGetTime();
 
 		/* Cleaning buffers and setting Matrix Mode */
 		glClearColor(0.2, 0.0, 0.0, 0.0);
-
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
 		if (flag_mode_cam)
 		{
-			gluLookAt(-taille_x / 2., -25. + avance_cam_y, taille_z / 2.,
+			gluLookAt(-taille_x / 2., -15. + avance_cam_y, taille_z / 2.,
 					  -taille_x / 2., 5. + dist_zoom + avance_cam_y, taille_z / 2.,
 					  0.0, 0.0, 1.0);
 		}
@@ -208,26 +219,12 @@ int main(int argc, char **argv)
 			setCamera();
 		}
 
-		/*
-	printf("Etape animation:\n");*/
 		glPushMatrix();
-		/*
-		printf("Murs\n");
-	*/
 		drawMurs(lst);
 		drawFrame();
-		/*
-		printf("Balle\n");
-	*/
 		drawBalle(balle);
-		/*
-		printf("Problème??\n");
-		*/
-		drawObstacles(obstacles);
-		/*
-		printf("Non\n");
-		*/
-
+		drawObstacles(obstacles, joueur);
+		drawJoueur(joueur);
 		glPopMatrix();
 
 		/* Swap front and back buffers */
@@ -244,38 +241,24 @@ int main(int argc, char **argv)
 			glfwWaitEventsTimeout(FRAMERATE_IN_SECONDS - elapsedTime);
 		}
 
-		/* Animate scenery */
-		if (flag_animate_rot_scale == 1)
+		if (flag_animate_balle == 1 && flag_balle_collante == 0)
 		{
-			pas_base += .1;
-		}
-		if (flag_animate_rot_arm == 1)
-		{
-			if (pas_balancier >= 10.)
-			{
-				index_balancier = -1.;
-			}
-			else if (pas_balancier <= -10.)
-			{
-				index_balancier = 1.;
-			}
-			pas_balancier += index_balancier;
-		}
-		if (flag_animate_balle == 1)
-		{
-			colision_balle_obs(&balle, obstacles);
+			colision_balle_obs(&balle, obstacles, joueur);
 			colision_balle_mur(&balle, taille_x, taille_z);
+			colision_balle_joueur(&balle, joueur);
+
 			mouv_balle(&balle);
 		}
-		if (avance_cam_y >= nb_section * taille_y - taille_y / 2)
+		else if (flag_animate_balle == 0)
 		{
-			/*/
-			printf("Affichage maj.\n");
-			*/
+			continue;
+		}
+		if (avance_cam_y >= nb_section * taille_y - taille_y / 2 || balle.y >= nb_section * taille_y - 15)
+		{
+			/*Ajout Remparts/Murs*/
+			printf("Ajout Remparts/Murs\n");
 			nb_section += 1;
-			/*
-			printf("debut_x, debut_y , debut_z, taille_x, taille_y, taille_z : %f, %f, %f, %f, %f, %f", debut_x, debut_y + taille_y, debut_z, taille_x, taille_y, taille_z);
-			*/
+
 			if (insererM(&lst, debut_x, debut_y + taille_y, debut_z, taille_x, taille_y, taille_z) == -1)
 			{
 				printf("Erreur. insererM\n");
@@ -286,14 +269,76 @@ int main(int argc, char **argv)
 				printf("Erreur. insererO\n");
 				exit(0);
 			}
-			printfObstacles(obstacles);
 			debut_y += taille_y;
 		}
+		/*MIS A JOUR DU JOUEUR ET SON CADRE*/
+		glfwGetCursorPos(window, &xpos, &zpos);
+		joueur.x = -(TAILLE_X - (xpos / WINDOW_WIDTH) * TAILLE_X);
+		joueur.z = TAILLE_Z - (zpos / WINDOW_HEIGHT) * TAILLE_Z;
+		if (flag_balle_collante)
+		{
+			balle.x = joueur.x;
+			balle.y = joueur.y;
+			balle.z = joueur.z;
+		}
+		/*Mis à jour Raquette du Joueur*/
+		if (joueur.x + joueur.dist_cote >= 0)
+		{
+			joueur.min_cote_x = -2 * joueur.dist_cote;
+			joueur.max_cote_x = 0;
+		}
+		else if (joueur.x - joueur.dist_cote <= -joueur.max_x)
+		{
+			joueur.min_cote_x = -joueur.max_x;
+			joueur.max_cote_x = -joueur.max_x + joueur.dist_cote * 2;
+		}
+		else
+		{
+			joueur.min_cote_x = joueur.x - joueur.dist_cote;
+			joueur.max_cote_x = joueur.x + joueur.dist_cote;
+		}
+
+		if (joueur.z + joueur.dist_cote >= joueur.max_z)
+		{
+			joueur.min_cote_z = joueur.max_z - 2 * joueur.dist_cote;
+			joueur.max_cote_z = joueur.max_z;
+		}
+		else if (joueur.z - joueur.dist_cote <= 0.)
+		{
+			joueur.min_cote_z = 0;
+			joueur.max_cote_z = joueur.dist_cote * 2;
+		}
+		else
+		{
+			joueur.min_cote_z = joueur.z - joueur.dist_cote;
+			joueur.max_cote_z = joueur.z + joueur.dist_cote;
+		}
 		/*
-		printf("Collion maj:\n");
+		glRasterPos2f(15, 15);
 		*/
+
+		if (balle.y <= joueur.y && colision_balle_joueur(&balle, joueur) == 0 && flag_balle_collante == 0)
+		{
+			joueur.vie -= 1;
+			flag_balle_collante = 1;
+			printf("Vie perdu : ");
+			if (joueur.vie > 0)
+			{
+				printf(" plus que %d et score actuel de %d\n", joueur.vie, joueur.score);
+			}
+			else
+			{
+				printf(" DOMMAGE GAME OVER!!\nScore final : %d\n", joueur.score);
+			}
+		}
+		else if (balle.y > joueur.score)
+		{
+			joueur.score = balle.y;
+		}
 	}
 
 	glfwTerminate();
+	freePile(&lst);
+	freePile(&obstacles);
 	return 0;
 }

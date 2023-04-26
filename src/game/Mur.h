@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define DIST_RAYON_COTE_RAQUETTE 1.5
+
 #ifndef __MUR__
 #define __MUR__
 
@@ -46,6 +48,8 @@ Murs *AlloueMurs(float debut_x, float debut_y, float debut_z, float taille_x, fl
 Obstacles *AlloueObstacles1(float debut_x, float debut_y, float debut_z, float taille_x, float taille_y, float taille_z);
 
 Obstacles *AlloueObstacles2(float debut_x, float debut_y, float debut_z, float taille_x, float taille_y, float taille_z);
+
+Obstacles *AlloueObstacles3(float debut_x, float debut_y, float debut_z, float taille_x, float taille_y, float taille_z);
 
 int insererM(LstMurs *lst, float debut_x, float debut_y, float debut_z, float taille_x, float taille_y, float taille_z);
 
