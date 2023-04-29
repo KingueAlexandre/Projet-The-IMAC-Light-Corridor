@@ -259,6 +259,18 @@ void drawBalle(Balle balle)
 
 void drawJoueur(Joueur joueur)
 {
+    glColor3f(0., 1., 1.);
+    for (int i = 0; i < joueur.vie; i++)
+    {
+        glBegin(GL_TRIANGLE_FAN);
+        float step_rad = 2 * M_PI / (float)100;
+        for (int i2 = 0; i2 <= 100; i2++)
+        {
+            glVertex3f(-TAILLE_X + 1 + 0.35 * i + 0.25 * cos(i2 * step_rad), joueur.y, TAILLE_Z - 1 + 0.25 * sin(i2 * step_rad));
+        }
+        glEnd();
+    }
+
     glColor3f(1., 1., 1.);
 
     glBegin(GL_LINE_LOOP);
@@ -278,54 +290,31 @@ void drawBonus(Bonus bonus)
     glBegin(GL_LINE_LOOP);
     if (bonus.type_bonus)
     {
-        glColor3f(0., 0., 0.);
+        glColor3f(.5, 0.5, 0.);
     }
     else
     {
         glColor3f(1., 1., 1.);
     }
     glVertex3f(bonus.x, bonus.y, bonus.z - 2 * bonus.indic_taille);
-    glVertex3f(bonus.x + bonus.indic_taille * cos(bonus.angle_x), bonus.y - bonus.indic_taille * sin(bonus.angle_y), bonus.z);
+    glVertex3f(bonus.x + bonus.indic_taille * cos(bonus.angle), bonus.y - bonus.indic_taille * sin(bonus.angle), bonus.z);
     glVertex3f(bonus.x, bonus.y, bonus.z + 2 * bonus.indic_taille);
 
-    glVertex3f(bonus.x + bonus.indic_taille * cos(bonus.angle_x + PI / 2), bonus.y - bonus.indic_taille * sin(bonus.angle_y + PI / 2), bonus.z);
+    glVertex3f(bonus.x + bonus.indic_taille * cos(bonus.angle + PI / 2), bonus.y - bonus.indic_taille * sin(bonus.angle + PI / 2), bonus.z);
     glVertex3f(bonus.x, bonus.y, bonus.z - 2 * bonus.indic_taille);
 
-    glVertex3f(bonus.x + bonus.indic_taille * cos(bonus.angle_x - PI / 2), bonus.y - bonus.indic_taille * sin(bonus.angle_y - PI / 2), bonus.z);
+    glVertex3f(bonus.x + bonus.indic_taille * cos(bonus.angle - PI / 2), bonus.y - bonus.indic_taille * sin(bonus.angle - PI / 2), bonus.z);
     glVertex3f(bonus.x, bonus.y, bonus.z + 2 * bonus.indic_taille);
 
-    glVertex3f(bonus.x + bonus.indic_taille * cos(bonus.angle_x + PI), bonus.y - bonus.indic_taille * sin(bonus.angle_y + PI), bonus.z);
+    glVertex3f(bonus.x + bonus.indic_taille * cos(bonus.angle + PI), bonus.y - bonus.indic_taille * sin(bonus.angle + PI), bonus.z);
     glVertex3f(bonus.x, bonus.y, bonus.z - 2 * bonus.indic_taille);
 
-    glVertex3f(bonus.x + bonus.indic_taille * cos(bonus.angle_x), bonus.y - bonus.indic_taille * sin(bonus.angle_y), bonus.z);
-    glVertex3f(bonus.x + bonus.indic_taille * cos(bonus.angle_x + PI / 2), bonus.y - bonus.indic_taille * sin(bonus.angle_y + PI / 2), bonus.z);
-    glVertex3f(bonus.x + bonus.indic_taille * cos(bonus.angle_x + PI), bonus.y - bonus.indic_taille * sin(bonus.angle_y + PI), bonus.z);
-    glVertex3f(bonus.x + bonus.indic_taille * cos(bonus.angle_x - PI / 2), bonus.y - bonus.indic_taille * sin(bonus.angle_y - PI / 2), bonus.z);
-    glVertex3f(bonus.x + bonus.indic_taille * cos(bonus.angle_x), bonus.y - bonus.indic_taille * sin(bonus.angle_y), bonus.z);
+    glVertex3f(bonus.x + bonus.indic_taille * cos(bonus.angle), bonus.y - bonus.indic_taille * sin(bonus.angle), bonus.z);
+    glVertex3f(bonus.x + bonus.indic_taille * cos(bonus.angle + PI / 2), bonus.y - bonus.indic_taille * sin(bonus.angle + PI / 2), bonus.z);
+    glVertex3f(bonus.x + bonus.indic_taille * cos(bonus.angle + PI), bonus.y - bonus.indic_taille * sin(bonus.angle + PI), bonus.z);
+    glVertex3f(bonus.x + bonus.indic_taille * cos(bonus.angle - PI / 2), bonus.y - bonus.indic_taille * sin(bonus.angle - PI / 2), bonus.z);
+    glVertex3f(bonus.x + bonus.indic_taille * cos(bonus.angle), bonus.y - bonus.indic_taille * sin(bonus.angle), bonus.z);
 
-    /*
-        glVertex3f(bonus.x - bonus.indic_taille, bonus.y - bonus.indic_taille, bonus.z - bonus.indic_taille);
-        glVertex3f(bonus.x + bonus.indic_taille, bonus.y - bonus.indic_taille, bonus.z - bonus.indic_taille);
-        glVertex3f(bonus.x + bonus.indic_taille, bonus.y + bonus.indic_taille, bonus.z - bonus.indic_taille);
-        glVertex3f(bonus.x - bonus.indic_taille, bonus.y + bonus.indic_taille, bonus.z - bonus.indic_taille);
-        glVertex3f(bonus.x - bonus.indic_taille, bonus.y - bonus.indic_taille, bonus.z - bonus.indic_taille);
-
-        glVertex3f(bonus.x - bonus.indic_taille, bonus.y - bonus.indic_taille, bonus.z + bonus.indic_taille);
-
-        glVertex3f(bonus.x + bonus.indic_taille, bonus.y - bonus.indic_taille, bonus.z + bonus.indic_taille);
-        glVertex3f(bonus.x + bonus.indic_taille, bonus.y - bonus.indic_taille, bonus.z - bonus.indic_taille);
-        glVertex3f(bonus.x + bonus.indic_taille, bonus.y - bonus.indic_taille, bonus.z + bonus.indic_taille);
-
-        glVertex3f(bonus.x + bonus.indic_taille, bonus.y + bonus.indic_taille, bonus.z + bonus.indic_taille);
-        glVertex3f(bonus.x + bonus.indic_taille, bonus.y + bonus.indic_taille, bonus.z - bonus.indic_taille);
-        glVertex3f(bonus.x + bonus.indic_taille, bonus.y + bonus.indic_taille, bonus.z + bonus.indic_taille);
-
-        glVertex3f(bonus.x - bonus.indic_taille, bonus.y + bonus.indic_taille, bonus.z + bonus.indic_taille);
-        glVertex3f(bonus.x - bonus.indic_taille, bonus.y + bonus.indic_taille, bonus.z - bonus.indic_taille);
-        glVertex3f(bonus.x - bonus.indic_taille, bonus.y + bonus.indic_taille, bonus.z + bonus.indic_taille);
-
-        glVertex3f(bonus.x - bonus.indic_taille, bonus.y - bonus.indic_taille, bonus.z + bonus.indic_taille);
-    */
     glEnd();
     glPopMatrix();
 }

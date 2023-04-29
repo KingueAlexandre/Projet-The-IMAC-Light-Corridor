@@ -216,8 +216,8 @@ int main(int argc, char **argv)
 		exit(0);
 	}
 
-	bonus1 = generateBonus(rand() % 2, joueur.y, DIST_CAM_RAQ, TAILLE_X, TAILLE_Y, TAILLE_Z, nb_section);
-	bonus2 = generateBonus(rand() % 2, joueur.y, DIST_CAM_RAQ, TAILLE_X, TAILLE_Y, TAILLE_Z, nb_section);
+	bonus1 = generateBonus(rand() % 2, joueur.y, DIST_CAM_RAQ, TAILLE_X, TAILLE_Y, TAILLE_Z);
+	bonus2 = generateBonus(rand() % 2, joueur.y, DIST_CAM_RAQ, TAILLE_X, TAILLE_Y, TAILLE_Z);
 	printf("(%f,%f,%f) size = %f\n", bonus1.x, bonus1.y, bonus1.z, bonus1.indic_taille * 2);
 	printf("(%f,%f,%f) size = %f\n", bonus2.x, bonus2.y, bonus2.z, bonus2.indic_taille * 2);
 
@@ -297,6 +297,8 @@ int main(int argc, char **argv)
 			}
 
 			mouv_balle(&balle);
+			bonus1.angle += 0.1;
+			bonus2.angle += 0.1;
 		}
 		else if (flag_animate_balle == 0)
 		{
@@ -388,11 +390,11 @@ int main(int argc, char **argv)
 		}
 		if (joueur.y >= bonus1.y)
 		{
-			bonus1 = generateBonus(rand() % 2, joueur.y, DIST_CAM_RAQ, TAILLE_X, TAILLE_Y, TAILLE_Z, nb_section);
+			bonus1 = generateBonus(rand() % 2, joueur.y, DIST_CAM_RAQ, TAILLE_X, TAILLE_Y, TAILLE_Z);
 		}
 		if (joueur.y >= bonus2.y)
 		{
-			bonus2 = generateBonus(rand() % 2, joueur.y, DIST_CAM_RAQ, TAILLE_X, TAILLE_Y, TAILLE_Z, nb_section);
+			bonus2 = generateBonus(rand() % 2, joueur.y, DIST_CAM_RAQ, TAILLE_X, TAILLE_Y, TAILLE_Z);
 		}
 	}
 

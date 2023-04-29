@@ -238,7 +238,7 @@ int colision_bonus_balle(Bonus *bonus1, Bonus *bonus2, Balle balle, Joueur *joue
         }
         printf("BONUS! %d\n", bonus1->type_bonus);
 
-        *bonus1 = generateBonus(rand() % 2, joueur->y, DIST_CAM_RAQ, TAILLE_X, TAILLE_Y, TAILLE_Z, nb_section);
+        *bonus1 = generateBonus(rand() % 2, joueur->y, DIST_CAM_RAQ, TAILLE_X, TAILLE_Y, TAILLE_Z);
         printf("(%f,%f,%f) size = %f\n", bonus1->x, bonus1->y, bonus1->z, bonus1->indic_taille * 2);
     }
     if ((bonus2->x - bonus2->indic_taille <= balle.x + 1 && balle.x - 1 <= bonus2->x + bonus2->indic_taille) &&
@@ -255,7 +255,7 @@ int colision_bonus_balle(Bonus *bonus1, Bonus *bonus2, Balle balle, Joueur *joue
         }
         printf("BONUS! %d\n", bonus2->type_bonus);
 
-        *bonus2 = generateBonus(rand() % 2, joueur->y, DIST_CAM_RAQ, TAILLE_X, TAILLE_Y, TAILLE_Z, nb_section);
+        *bonus2 = generateBonus(rand() % 2, joueur->y, DIST_CAM_RAQ, TAILLE_X, TAILLE_Y, TAILLE_Z);
         printf("(%f,%f,%f) size = %f\n", bonus2->x, bonus2->y, bonus2->z, bonus2->indic_taille * 2);
     }
     return ret;
