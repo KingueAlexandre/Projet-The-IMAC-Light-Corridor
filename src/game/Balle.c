@@ -148,12 +148,21 @@ void colision_balle_obs(Balle *balle, LstObstacles obstacles, Joueur joueur)
     }
 }
 
-int colision_balle_joueur(Balle *balle, Joueur joueur)
+int colision_balle_joueur(Balle *balle, Joueur joueur, int flag_attente_balle_collante)
 {
+
     if ((balle->y >= joueur.y && balle->y - 1. <= joueur.y) &&
         (joueur.max_cote_x >= balle->x && joueur.min_cote_x <= balle->x) &&
         (joueur.max_cote_z >= balle->z && joueur.min_cote_z <= balle->z))
     {
+        /*BALLE COLLANTE*/
+        if (flag_attente_balle_collante)
+        {
+            balle->x = joueur.x;
+            balle->y = joueur.y;
+            balle->z = joueur.z;
+            return 2;
+        }
         /*
         printf("Colision Raquette\n");
         printf("Balle: (%f,%f,%f)\n", balle->x, balle->y, balle->z);
@@ -210,4 +219,44 @@ int collision_joueur_murs(LstObstacles obstacles, Joueur joueur)
         ret = ret->suivant;
     }
     return 0;
+}
+
+int colision_bonus_balle(Bonus *bonus1, Bonus *bonus2, Balle balle, Joueur *joueur, int nb_section)
+{
+    int ret = 0;
+    if ((bonus1->x - bonus1->indic_taille <= balle.x + 1 && balle.x - 1 <= bonus1->x + bonus1->indic_taille) &&
+        (bonus1->y - bonus1->indic_taille <= balle.y + 1 && balle.y - 1 <= bonus1->y + bonus1->indic_taille) &&
+        (bonus1->z - 2 * bonus1->indic_taille <= balle.z + 1 && balle.z - 1 <= bonus1->z + 2 * bonus1->indic_taille))
+    {
+        if (bonus1->type_bonus == 0)
+        {
+            joueur->vie += 1;
+        }
+        else if (bonus1->type_bonus == 1)
+        {
+            ret = 1;
+        }
+        printf("BONUS! %d\n", bonus1->type_bonus);
+
+        *bonus1 = generateBonus(rand() % 2, joueur->y, DIST_CAM_RAQ, TAILLE_X, TAILLE_Y, TAILLE_Z, nb_section);
+        printf("(%f,%f,%f) size = %f\n", bonus1->x, bonus1->y, bonus1->z, bonus1->indic_taille * 2);
+    }
+    if ((bonus2->x - bonus2->indic_taille <= balle.x + 1 && balle.x - 1 <= bonus2->x + bonus2->indic_taille) &&
+        (bonus2->y - bonus2->indic_taille <= balle.y + 1 && balle.y - 1 <= bonus2->y + bonus2->indic_taille) &&
+        (bonus2->z - 2 * bonus2->indic_taille <= balle.z + 1 && balle.z - 1 <= bonus2->z + 2 * bonus2->indic_taille))
+    {
+        if (bonus2->type_bonus == 0)
+        {
+            joueur->vie += 1;
+        }
+        else if (bonus2->type_bonus == 1)
+        {
+            ret = 1;
+        }
+        printf("BONUS! %d\n", bonus2->type_bonus);
+
+        *bonus2 = generateBonus(rand() % 2, joueur->y, DIST_CAM_RAQ, TAILLE_X, TAILLE_Y, TAILLE_Z, nb_section);
+        printf("(%f,%f,%f) size = %f\n", bonus2->x, bonus2->y, bonus2->z, bonus2->indic_taille * 2);
+    }
+    return ret;
 }

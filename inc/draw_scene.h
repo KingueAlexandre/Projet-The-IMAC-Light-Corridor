@@ -6,6 +6,8 @@
 #include <stdio.h>
 #include <math.h>
 
+#define PI 3.14159
+
 #include "../src/game/Mur.h"
 #include "../src/game/Balle.h"
 #include "../src/game/Joueur.h"
@@ -21,7 +23,7 @@ void drawArm();
 
 void drawPan();
 
-void drawMurs(LstMurs lst);
+void drawMurs(LstMurs lst, float cam_y);
 
 void drawObstacles(LstObstacles lst, Joueur joueur);
 
@@ -34,5 +36,7 @@ void printfMur(float mur[4][3]);
 void drawBalle(Balle balle);
 
 void drawJoueur(Joueur joueur);
+
+void drawBonus(Bonus bonus);
 
 #endif

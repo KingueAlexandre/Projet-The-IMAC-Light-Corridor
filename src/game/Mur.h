@@ -2,6 +2,9 @@
 #include <stdlib.h>
 
 #define DIST_RAYON_COTE_RAQUETTE 1.5
+#define TAILLE_X 15
+#define TAILLE_Y 100
+#define TAILLE_Z 15
 
 #ifndef __MUR__
 #define __MUR__
@@ -56,6 +59,8 @@ int insererM(LstMurs *lst, float debut_x, float debut_y, float debut_z, float ta
 int insererO(LstObstacles *lst, LstMurs murs);
 
 void freePile(LstMurs *murs);
+
+void freePileObs(LstObstacles *obs);
 
 LstMurs section_murs(LstMurs murs, int num);
 

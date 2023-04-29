@@ -1,6 +1,6 @@
 #include "Mur.h"
 
-#define FREQUENCE_OBS 40.
+#define FREQUENCE_OBS 20.
 
 static int courrant_num_mur = 0;
 static int courrant_num_obs = 0;
@@ -68,13 +68,16 @@ Obstacles *AlloueObstacles1(float debut_x, float debut_y, float debut_z, float t
     obstacles->type_obs = 1;
     obstacles->num = courrant_num_obs++;
 
-    tmp = ((float)rand() / (float)(RAND_MAX)) * (taille_x - DIST_RAYON_COTE_RAQUETTE * 2 + 2);
-    printf("tmp=%f\n", tmp);
+    tmp = DIST_RAYON_COTE_RAQUETTE * 2 + 1 + ((float)rand() / (float)(RAND_MAX)) * (taille_x - DIST_RAYON_COTE_RAQUETTE * 4 - 1);
+
+    printf("V tmp=%f\n", tmp);
+
     if (rand() % 2 == 0)
     {
         obstacles->sous_type = 0;
-
+        /*
         printf("1-0\n");
+        */
         obstacles->debut_x = -tmp;
         obstacles->debut_y = debut_y;
         obstacles->debut_z = debut_z;
@@ -101,8 +104,9 @@ Obstacles *AlloueObstacles1(float debut_x, float debut_y, float debut_z, float t
     else
     {
         obstacles->sous_type = 1;
-
+        /*
         printf("1-1\n");
+        */
         obstacles->debut_x = debut_x;
         obstacles->debut_y = debut_y;
         obstacles->debut_z = debut_z;
@@ -148,12 +152,16 @@ Obstacles *AlloueObstacles2(float debut_x, float debut_y, float debut_z, float t
     obstacles->type_obs = 1;
     obstacles->num = courrant_num_obs++;
 
-    tmp = ((float)rand() / (float)(RAND_MAX)) * (taille_z - DIST_RAYON_COTE_RAQUETTE * 2 + 2);
-    printf("tmp=%f\n", tmp);
+    tmp = DIST_RAYON_COTE_RAQUETTE * 2 + 1 + ((float)rand() / (float)(RAND_MAX)) * (taille_z - DIST_RAYON_COTE_RAQUETTE * 4 - 1);
+
+    printf("H tmp=%f\n", tmp);
+
     if (rand() % 2 == 0)
     {
         obstacles->sous_type = 0;
+        /*
         printf("2-0\n");
+        */
         obstacles->debut_x = debut_x;
         obstacles->debut_y = debut_y;
         obstacles->debut_z = debut_z;
@@ -180,7 +188,9 @@ Obstacles *AlloueObstacles2(float debut_x, float debut_y, float debut_z, float t
     else
     {
         obstacles->sous_type = 1;
+        /*
         printf("2-1\n");
+        */
         obstacles->debut_x = debut_x;
         obstacles->debut_y = debut_y;
         obstacles->debut_z = tmp;
@@ -226,12 +236,16 @@ Obstacles *AlloueObstacles3(float debut_x, float debut_y, float debut_z, float t
     obstacles->type_obs = 1;
     obstacles->num = courrant_num_obs++;
 
-    tmp = ((float)rand() / (float)(RAND_MAX)) * (taille_z - DIST_RAYON_COTE_RAQUETTE * 2 + 2);
+    tmp = DIST_RAYON_COTE_RAQUETTE * 2 + ((float)rand() / (float)(RAND_MAX)) * (taille_z - DIST_RAYON_COTE_RAQUETTE * 4 + 2);
+    /*
     printf("tmp=%f\n", tmp);
+    */
     if (rand() % 2 == 0)
     {
         obstacles->sous_type = 0;
+        /*
         printf("2-0\n");
+        */
         obstacles->debut_x = debut_x;
         obstacles->debut_y = debut_y;
         obstacles->debut_z = debut_z;
@@ -258,7 +272,9 @@ Obstacles *AlloueObstacles3(float debut_x, float debut_y, float debut_z, float t
     else
     {
         obstacles->sous_type = 1;
+        /*
         printf("2-1\n");
+        */
         obstacles->debut_x = debut_x;
         obstacles->debut_y = debut_y;
         obstacles->debut_z = tmp;
@@ -326,8 +342,9 @@ int insererO(LstObstacles *lst, LstMurs murs)
     }
     while (tmp_y <= max_y)
     {
-        printf("%f/%f  pas : %f\n", tmp_y, max_y, pas);
         /*
+        printf("%f/%f  pas : %f\n", tmp_y, max_y, pas);
+
         int tmp_z, tmp_x;
         */
         int type_obs = (rand() % 2) + 1;
@@ -374,6 +391,19 @@ void freePile(LstMurs *murs)
         iter = temp;
     }
     *murs = NULL;
+}
+
+void freePileObs(LstObstacles *obs)
+{
+    Obstacles *iter = *obs;
+    Obstacles *temp = iter;
+    while (iter != NULL)
+    {
+        temp = iter->suivant;
+        free(iter);
+        iter = temp;
+    }
+    *obs = NULL;
 }
 
 LstMurs section_murs(LstMurs murs, int num)

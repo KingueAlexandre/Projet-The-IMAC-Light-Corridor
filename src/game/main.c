@@ -11,9 +11,6 @@
 /* Window properties */
 static const unsigned int WINDOW_WIDTH = 750;
 static const unsigned int WINDOW_HEIGHT = 750;
-static float TAILLE_X = 15;
-static float TAILLE_Y = 100;
-static float TAILLE_Z = 15;
 static const char WINDOW_TITLE[] = "Main";
 static float aspectRatio = 1.0;
 
@@ -21,7 +18,6 @@ static float aspectRatio = 1.0;
 static float pas_base = 0.;
 static float pas_balancier = 0.;
 */
-static float dist_cam_raq = 13.;
 static float avance_cam_y = 2.;
 /*
 static float index_balancier = 1.;
@@ -35,11 +31,14 @@ static int flag_animate_rot_arm = 0;
 static int flag_mode_cam = 1;
 static int flag_animate_balle = 1;
 static int flag_balle_collante = 1;
+static int flag_attente_balle_collante = 0;
 
 static LstMurs lst;
 static LstObstacles obstacles;
 static Joueur joueur;
 static Balle balle;
+static Bonus bonus1;
+static Bonus bonus2;
 
 /* Error handling function */
 void onError(int error, const char *description)
@@ -126,14 +125,17 @@ static void mouse_button_callback(GLFWwindow *window, int button, int action, in
 	{
 		avance_cam_y += 5;
 		joueur.y += 5;
-
+		/*
 		printf("avance_cam_y : %f\n", avance_cam_y);
+		*/
 	}
-	else if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS && -dist_cam_raq <= -20. + avance_cam_y && flag_balle_collante == 0)
+	else if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS && -DIST_CAM_RAQ <= -20. + avance_cam_y && flag_balle_collante == 0)
 	{
 		avance_cam_y -= 5;
 		joueur.y -= 5;
+		/*
 		printf("avance_cam_y : %f\n", avance_cam_y);
+		*/
 	}
 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS && flag_balle_collante)
 	{
@@ -143,6 +145,36 @@ static void mouse_button_callback(GLFWwindow *window, int button, int action, in
 		balle.vec_z = 0.;
 		balle.y += 1.1;
 	}
+}
+
+void draw()
+{
+	/* Switch to 2D Mode */
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+	gluOrtho2D(0, 8, 0, 6);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	glEnable(GL_BLEND);
+	glDisable(GL_LIGHTING);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	/* Draw the gray transparent zone over the game */
+	glColor4f(0.8, 0.8, 0.8, 0.5);
+	glBegin(GL_QUADS);
+	glVertex3f(0, 0, 0);
+	glVertex3f(0, 6, 0);
+	glVertex3f(8, 6, 0);
+	glVertex3f(8, 0, 0);
+	glEnd();
+
+	/* Switch back to 3D Mode */
+	glEnable(GL_LIGHTING);
+	glDisable(GL_BLEND);
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+	glMatrixMode(GL_MODELVIEW);
 }
 
 int main(int argc, char **argv)
@@ -184,6 +216,11 @@ int main(int argc, char **argv)
 		exit(0);
 	}
 
+	bonus1 = generateBonus(rand() % 2, joueur.y, DIST_CAM_RAQ, TAILLE_X, TAILLE_Y, TAILLE_Z, nb_section);
+	bonus2 = generateBonus(rand() % 2, joueur.y, DIST_CAM_RAQ, TAILLE_X, TAILLE_Y, TAILLE_Z, nb_section);
+	printf("(%f,%f,%f) size = %f\n", bonus1.x, bonus1.y, bonus1.z, bonus1.indic_taille * 2);
+	printf("(%f,%f,%f) size = %f\n", bonus2.x, bonus2.y, bonus2.z, bonus2.indic_taille * 2);
+
 	/* Make the window's context current */
 	glfwMakeContextCurrent(window);
 
@@ -220,11 +257,15 @@ int main(int argc, char **argv)
 		}
 
 		glPushMatrix();
-		drawMurs(lst);
+
+		drawMurs(lst, -15. + avance_cam_y);
 		drawFrame();
 		drawBalle(balle);
 		drawObstacles(obstacles, joueur);
 		drawJoueur(joueur);
+		drawBonus(bonus1);
+		drawBonus(bonus2);
+
 		glPopMatrix();
 
 		/* Swap front and back buffers */
@@ -245,7 +286,15 @@ int main(int argc, char **argv)
 		{
 			colision_balle_obs(&balle, obstacles, joueur);
 			colision_balle_mur(&balle, taille_x, taille_z);
-			colision_balle_joueur(&balle, joueur);
+			if (colision_balle_joueur(&balle, joueur, flag_attente_balle_collante) == 2)
+			{
+				flag_attente_balle_collante = 0;
+				flag_balle_collante = 1;
+			}
+			if (colision_bonus_balle(&bonus1, &bonus2, balle, &joueur, nb_section))
+			{
+				flag_attente_balle_collante = 1;
+			}
 
 			mouv_balle(&balle);
 		}
@@ -256,7 +305,9 @@ int main(int argc, char **argv)
 		if (avance_cam_y >= nb_section * taille_y - taille_y / 2 || balle.y >= nb_section * taille_y - 15)
 		{
 			/*Ajout Remparts/Murs*/
+			/*
 			printf("Ajout Remparts/Murs\n");
+			*/
 			nb_section += 1;
 
 			if (insererM(&lst, debut_x, debut_y + taille_y, debut_z, taille_x, taille_y, taille_z) == -1)
@@ -317,7 +368,7 @@ int main(int argc, char **argv)
 		glRasterPos2f(15, 15);
 		*/
 
-		if (balle.y <= joueur.y && colision_balle_joueur(&balle, joueur) == 0 && flag_balle_collante == 0)
+		if (balle.y <= joueur.y && colision_balle_joueur(&balle, joueur, flag_attente_balle_collante) == 0 && flag_balle_collante == 0)
 		{
 			joueur.vie -= 1;
 			flag_balle_collante = 1;
@@ -335,10 +386,18 @@ int main(int argc, char **argv)
 		{
 			joueur.score = balle.y;
 		}
+		if (joueur.y >= bonus1.y)
+		{
+			bonus1 = generateBonus(rand() % 2, joueur.y, DIST_CAM_RAQ, TAILLE_X, TAILLE_Y, TAILLE_Z, nb_section);
+		}
+		if (joueur.y >= bonus2.y)
+		{
+			bonus2 = generateBonus(rand() % 2, joueur.y, DIST_CAM_RAQ, TAILLE_X, TAILLE_Y, TAILLE_Z, nb_section);
+		}
 	}
 
 	glfwTerminate();
 	freePile(&lst);
-	freePile(&obstacles);
+	freePileObs(&obstacles);
 	return 0;
 }
