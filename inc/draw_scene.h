@@ -7,6 +7,7 @@
 #include <math.h>
 
 #define PI 3.14159
+#define NB_TEXTURE 17
 
 #include "../src/game/Mur.h"
 #include "../src/game/Balle.h"
@@ -14,6 +15,22 @@
 
 #ifndef __DRAW__
 #define __DRAW__
+
+/*TYPE STRUCTURÉ REGROUPANT TOUTE LES INFOS UTILES POUR LOAD UNE TEXTURE*/
+typedef struct Texture
+{
+    unsigned char *Niveau1;
+    unsigned int texture;
+    int largeur;
+    int hauteur;
+    int nbcanaux;
+} Texture;
+
+/*FONCTION CHARGEANT LES TEXTURE UTILES*/
+void loadtextures();
+
+/*FONCTION LIBÉRANT LES TEXTURES UTILES*/
+void freetextures();
 
 void drawFrame();
 
@@ -38,5 +55,11 @@ void drawBalle(Balle balle);
 void drawJoueur(Joueur joueur);
 
 void drawBonus(Bonus bonus);
+
+void drawMenu();
+
+void draw_result(int i);
+
+void draw_result_score(int score);
 
 #endif

@@ -37,6 +37,6 @@ int colision_balle_joueur(Balle *balle, Joueur joueur, int flag_attente_balle_co
 
 int collision_joueur_murs(LstObstacles obstacles, Joueur joueur);
 
-int colision_bonus_balle(Bonus *bonus1, Bonus *bonus2, Balle balle, Joueur *joueur, int nb_section);
+int colision_bonus_balle(Bonus *bonus1, Bonus *bonus2, Bonus *bonus3, Balle *balle, Joueur *joueur, int nb_section);
 
 #endif

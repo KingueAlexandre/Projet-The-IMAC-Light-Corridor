@@ -42,11 +42,11 @@ typedef struct Obstacles
     float r;
     float g;
     float b;
-
+    int vie;
     struct Obstacles *suivant;
 } Obstacles, *LstObstacles;
 
-Murs *AlloueMurs(float debut_x, float debut_y, float debut_z, float taille_x, float taille_y, float taille_z);
+Murs *AlloueMurs(float debut_x, float debut_y, float debut_z, float taille_x, float taille_y, float taille_z, int niveau);
 
 Obstacles *AlloueObstacles1(float debut_x, float debut_y, float debut_z, float taille_x, float taille_y, float taille_z);
 
@@ -54,14 +54,16 @@ Obstacles *AlloueObstacles2(float debut_x, float debut_y, float debut_z, float t
 
 Obstacles *AlloueObstacles3(float debut_x, float debut_y, float debut_z, float taille_x, float taille_y, float taille_z);
 
-int insererM(LstMurs *lst, float debut_x, float debut_y, float debut_z, float taille_x, float taille_y, float taille_z);
+int insererM(LstMurs *lst, float debut_x, float debut_y, float debut_z, float taille_x, float taille_y, float taille_z, int niveau);
 
-int insererO(LstObstacles *lst, LstMurs murs);
+int insererO(LstObstacles *lst, LstMurs murs, int niveau);
 
 void freePile(LstMurs *murs);
 
 void freePileObs(LstObstacles *obs);
 
 LstMurs section_murs(LstMurs murs, int num);
+
+int victoire(LstObstacles obs);
 
 #endif
