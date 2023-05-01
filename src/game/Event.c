@@ -443,7 +443,6 @@ int The_Light_Corridor()
         }
         else if (flag_result == 0) /*LA DÉFAITE*/
         {
-            draw_result_score(0);
             draw_result(5);
         }
 
